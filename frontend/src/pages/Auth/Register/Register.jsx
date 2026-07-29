@@ -88,6 +88,8 @@ export default function Register() {
 
       {error && <p role="alert">{error}</p>}
 
+      <a href="#">Scan Face ID</a>
+
       <button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Registering..." : "Register"}
       </button>

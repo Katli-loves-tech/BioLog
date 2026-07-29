@@ -6,12 +6,11 @@ const EMPTY_FORM = {
   firstName: "",
   lastName: "",
   idNumber: "",
-  position: "",
+  position: "Employee",
   department: "",
   contactNumber: "",
   email: "",
   gender: "",
-  role: "Employee",
 };
 
 export default function RegisterEmployee() {
@@ -76,10 +75,10 @@ export default function RegisterEmployee() {
 
       <label>
         Position
-        <input
-          value={form.position}
-          onChange={(e) => handleChange("position", e.target.value)}
-        />
+        <select value={form.position} onChange={(e) => handleChange("position", e.target.value)}>
+          <option value="Employee">Employee</option>
+          <option value="HR">HR</option>
+        </select>
       </label>
 
       <label>
@@ -124,19 +123,7 @@ export default function RegisterEmployee() {
       </label>
 
       <label>
-        Role
-        <select value={form.role} onChange={(e) => handleChange("role", e.target.value)}>
-          <option value="Employee">Employee</option>
-          <option value="HR">HR</option>
-        </select>
-      </label>
-
-      <label>
-        Face Vector
-        {/* Captured later via mobile facial enrollment, matched back to this
-            employee by employeeNumber. Not something an admin can fill in
-            from a desktop form. */}
-        <input value="Set via mobile enrollment" disabled />
+        <a href="#">Scan Face ID</a>
       </label>
 
       <button type="submit" disabled={isSubmitting}>

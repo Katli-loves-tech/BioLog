@@ -10,11 +10,8 @@ export default function AdminSettings() {
   const [passwordError, setPasswordError] = useState("");
   const [passwordSuccess, setPasswordSuccess] = useState("");
 
-  const [infoForm, setInfoForm] = useState({
-    firstName: "",
-    lastName: "",
-    contactNumber: "",
-    email: "",
+  const [fullnameForm, setfullnameForm] = useState({
+    fullname: "",
   });
   const [infoError, setInfoError] = useState("");
   const [infoSuccess, setInfoSuccess] = useState("");
@@ -43,7 +40,7 @@ export default function AdminSettings() {
   };
 
   const handleInfoChange = (field, value) => {
-    setInfoForm((prev) => ({ ...prev, [field]: value }));
+    setfullnameForm((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleInfoSubmit = async (e) => {
@@ -52,7 +49,7 @@ export default function AdminSettings() {
     setInfoSuccess("");
 
     try {
-      await updateAdminInfo(infoForm);
+      await updateAdminInfo(fullnameForm);
       setInfoSuccess("Information updated successfully.");
     } catch (err) {
       setInfoError(err.message);
@@ -110,39 +107,13 @@ export default function AdminSettings() {
         {infoSuccess && <p>{infoSuccess}</p>}
         <form onSubmit={handleInfoSubmit}>
           <label>
-            First Name
+            Full Name
             <input
-              value={infoForm.firstName}
+              value={fullnameForm.firstName}
               onChange={(e) => handleInfoChange("firstName", e.target.value)}
             />
           </label>
-
-          <label>
-            Last Name
-            <input
-              value={infoForm.lastName}
-              onChange={(e) => handleInfoChange("lastName", e.target.value)}
-            />
-          </label>
-
-          <label>
-            Contact Number
-            <input
-              value={infoForm.contactNumber}
-              onChange={(e) => handleInfoChange("contactNumber", e.target.value)}
-            />
-          </label>
-
-          <label>
-            Email
-            <input
-              type="email"
-              value={infoForm.email}
-              onChange={(e) => handleInfoChange("email", e.target.value)}
-            />
-          </label>
-
-          <button type="submit">Save Changes</button>
+          <button type="submit">Update Name</button>
         </form>
       </section>
     </div>
