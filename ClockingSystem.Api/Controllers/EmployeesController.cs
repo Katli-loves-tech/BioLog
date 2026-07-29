@@ -55,6 +55,22 @@ public class EmployeesController : ControllerBase
         return Ok(new EmployeeResponse(e.EmployeeNumber, e.FirstName, e.LastName, e.Department, e.IsActive));
     }
 
+    [HttpPost("{empNo}/verify-face")]
+    public async Task<IActionResult> VerifyFace(string empNo, [FromBody] FaceVerificationRequest req)
+    {
+        if (req.Vector is null || req.Vector.Length == 0)
+            return BadRequest("A face vector is required.");
+
+        var employee = await _db.Employees.FindAsync(empNo);
+        if (employee == null || employee.FaceVector is null)
+            return NotFound("Employee not found or no face vector has been enrolled.");
+
+        var similarity = CalculateSimilarity(employee.FaceVector.ToArray(), req.Vector);
+        var matched = similarity >= (req.Threshold > 0 ? req.Threshold : 0.85);
+
+        return Ok(new FaceVerificationResponse(employee.EmployeeNumber, similarity, matched));
+    }
+
     [Authorize(Roles = "Superadmin")]
     [HttpPost("{empNo}/face-vector")]
     public async Task<IActionResult> SetFaceVector(string empNo, [FromBody] float[] vector)
@@ -65,6 +81,32 @@ public class EmployeesController : ControllerBase
         employee.FaceVector = new Pgvector.Vector(vector);
         await _db.SaveChangesAsync();
         return Ok();
+    }
+
+    private static double CalculateSimilarity(float[] storedVector, float[] probeVector)
+    {
+        if (storedVector is null || probeVector is null || storedVector.Length == 0 || probeVector.Length == 0)
+            return 0;
+
+        if (storedVector.Length != probeVector.Length)
+            return 0;
+
+        double dot = 0;
+        double norm1 = 0;
+        double norm2 = 0;
+
+        for (var i = 0; i < storedVector.Length; i++)
+        {
+            dot += storedVector[i] * probeVector[i];
+            norm1 += storedVector[i] * storedVector[i];
+            norm2 += probeVector[i] * probeVector[i];
+        }
+
+        if (norm1 == 0 || norm2 == 0)
+            return 0;
+
+        var similarity = dot / (Math.Sqrt(norm1) * Math.Sqrt(norm2));
+        return Math.Round(similarity, 4);
     }
 
     // Admin Dashboard employee list — Name, Surname, Phone, Email, and the

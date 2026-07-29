@@ -6,3 +6,7 @@ public record RegisterEmployeeRequest(
 public record EmployeeResponse(
     string EmployeeNumber, string FirstName, string LastName,
     string? Department, bool IsActive);
+
+public record FaceVerificationRequest(float[] Vector, double Threshold = 0.85);
+
+public record FaceVerificationResponse(string EmployeeNumber, double Similarity, bool Matched);
