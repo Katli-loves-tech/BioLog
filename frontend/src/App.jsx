@@ -25,7 +25,7 @@ export default function App() {
           <Route path="settings" element={<AdminSettings />} />
         </Route>
 
-        {/* No auth/route-guarding yet — per today's decision, everything
+        {/* No auth/route-guarding yet. Everything
             defaults to the admin dashboard until real auth is wired in. */}
         <Route path="/" element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
