@@ -1,0 +1,129 @@
+# Frontend Handoff Notes — Admin Side
+
+What was built, why, and what still needs a decision. Read the "Open items"
+section before your team combines everyone's work tomorrow.
+
+## 1. Setup before these files will run
+
+```bash
+npm install react-router-dom
+```
+
+That's the only new dependency. Drop `App.jsx` into `src/`, and put the rest
+of the folders under `src/` matching the paths below (they already match
+your proposed file structure). No changes to `main.jsx` are needed — `App.jsx`
+sets up its own `<BrowserRouter>` internally.
+
+Optional: create a `.env` file in the project root with:
+```
+VITE_API_BASE_URL=http://localhost:5000/api
+```
+If you skip this, `src/services/api.js` falls back to that same default.
+
+## 2. Files added
+
+```
+src/App.jsx                                        (replaces the Vite default)
+src/services/api.js                                 (new — all backend calls)
+src/components/Sidebar/Sidebar.jsx                   (new — shared nav)
+src/components/Layout/AdminLayout.jsx                (new — keeps sidebar mounted)
+src/pages/Auth/Login/Login.jsx                        (PLACEHOLDER — see below)
+src/pages/Auth/Register/Register.jsx
+src/pages/Auth/ForgotPassword/ForgotPassword.jsx
+src/pages/Admin/Dashboard/AdminDashboard.jsx
+src/pages/Admin/RegisterEmployee/RegisterEmployee.jsx
+src/pages/Admin/Settings/AdminSettings.jsx
+```
+
+No `.css` files were created, per your instruction to hold off on styling
+until the design comes in. No JWT/session logic was added — everything below
+assumes it'll be wired in tomorrow.
+
+## 3. Routing (`App.jsx`)
+
+| Path | Page | Notes |
+|---|---|---|
+| `/login` | `Login.jsx` | Placeholder — see below |
+| `/register` | `Register.jsx` | |
+| `/forgot-password` | `ForgotPassword.jsx` | |
+| `/admin/dashboard` | `AdminDashboard.jsx` | wrapped in `AdminLayout` |
+| `/admin/register-employee` | `RegisterEmployee.jsx` | wrapped in `AdminLayout` |
+| `/admin/settings` | `AdminSettings.jsx` | wrapped in `AdminLayout` |
+| `/` and any unknown path | redirects to `/admin/dashboard` | temporary — see Open Items |
+
+`AdminLayout.jsx` renders `Sidebar` once and uses React Router's `<Outlet />`
+so the sidebar never unmounts while you move between the three admin pages —
+that's what satisfies "side bar remains active" from your spec.
+
+## 4. Why Login.jsx exists even though it's not your page
+
+`App.jsx` needs a component to route `/login` to. Since that page belongs to
+a teammate and isn't built yet, I added a minimal working stand-in (basic
+form, calls the API, redirects to `/admin/dashboard`) so routing doesn't
+break while everyone works in parallel. **Delete/replace it** the moment the
+real `Login.jsx` exists — nothing else references its internals, only the
+`/login` route path.
+
+## 5. `services/api.js`
+
+Every page calls a function from here instead of using `fetch` directly, so
+when the real backend routes are confirmed with your 3 backend devs, there's
+one file to update rather than eight. Endpoint paths in there (`/auth/login`,
+`/employees`, etc.) are **assumptions** — check them against whatever the
+backend team actually ships.
+
+## 6. Decisions made per your answers today
+
+- **FaceVector on RegisterEmployee.jsx**: shown as a disabled input with the
+  label "Set via mobile enrollment" — not editable, not sent to the backend
+  on submit. The actual 128-float vector gets attached later via the mobile
+  app's enrollment flow, matched by `employeeNumber`.
+- **Role field added to RegisterEmployee.jsx**: a dropdown (`Employee` /
+  `HR`), defaulting to `Employee`. Also added to the AdminDashboard update
+  form, since your spec listed Role as a column in that table.
+- **No auth gating for now**: nothing checks whether anyone is "logged in."
+  `Login.jsx`'s placeholder just redirects straight to the dashboard, and
+  `/` and any unmatched route also redirect there — so you can open the app
+  and land straight on the dashboard for now, as agreed.
+
+## 7. AdminDashboard.jsx — how Update/Delete works
+
+- **Delete** calls `deleteEmployee(employeeNumber)` after a `window.confirm`.
+- **Update** doesn't open a separate page — clicking it populates an edit
+  form that appears below the table (First Name, Last Name, Position,
+  Department, Contact Number, Email, Role). This deliberately excludes
+  IdNumber, FaceVector, Password, and Gender, per your spec. Submitting
+  calls `updateEmployee(employeeNumber, updates)` and reloads the list.
+
+This was a judgment call since your spec didn't describe *how* Update should
+work (inline row edit vs. modal vs. separate page) — flagging in case your
+team wants a different UX once the design comes in.
+
+## 8. Open items — needs your input before backend integration
+
+These aren't blockers for building the JSX (handled with reasonable
+placeholders above), but they'll bite during integration if not settled:
+
+1. **EmployeeNumber generation.** Is it auto-generated by the backend on
+   create, or does the Admin type it in on `RegisterEmployee.jsx`? Right now
+   that form does **not** collect it — confirm this is correct.
+2. **Who can ever become `Superadmin`?** Your `Admin` table only allows
+   `Superadmin` or `HR` roles, and `Register.jsx`'s docstring says it's "only
+   for HR, as admins are already on the system." That implies at least one
+   Superadmin has to be seeded directly in the database — not a frontend
+   problem, just confirm that's the plan so nobody goes looking for a
+   "create first admin" flow that doesn't exist.
+3. **AdminSettings "Update Information."** I built it to edit the logged-in
+   admin's own First Name / Last Name / Contact Number / Email, calling a
+   `PUT /admin/me`-style endpoint. Confirm that's actually what "update
+   information" meant on that page (vs. something else).
+4. **Backend endpoint contract.** Everything in `api.js` is my best guess at
+   route names and payload shapes based on your SQL schema. Swap them out
+   once the backend devs confirm the real ones — that's the only file that
+   should need to change.
+
+## 9. Not touched
+
+No backend code, no `.css`, no `main.jsx` changes, no HR pages (those
+weren't on your list), and no JWT/session logic (explicitly deferred per
+today's decision).
