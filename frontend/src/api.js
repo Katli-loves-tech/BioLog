@@ -147,6 +147,21 @@ export async function getOrganisationReport() {
   return request('/api/reports/organisation');
 }
 
+// Face recognition
+export async function setFaceVector(empNo, vector) {
+  return request(`/api/employees/${empNo}/face-vector`, {
+    method: 'POST',
+    body: JSON.stringify(vector),
+  });
+}
+
+export async function verifyFace(empNo, vector, threshold = 0.85) {
+  return request(`/api/employees/${empNo}/verify-face`, {
+    method: 'POST',
+    body: JSON.stringify({ vector, threshold }),
+  });
+}
+
 // Health check
 export async function healthCheck() {
   return request('/api/health');
