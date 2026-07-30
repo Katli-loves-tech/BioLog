@@ -44,7 +44,7 @@ Write-Host "Frontend:      $FrontendOrigin`n"
 Write-Host "1. Health Check" -ForegroundColor Yellow
 try {
     $resp = Invoke-RestMethod -Uri "$ApiUrl/api/health" -Method Get -TimeoutSec 15
-    Test-Step "API is reachable" ($resp.status -ne $null)
+    Test-Step "API is reachable" ($null -ne $resp.status)
     Test-Step "Database connected" ($resp.database -eq "connected") "($($resp.database))"
 } catch {
     Test-Step "API is reachable" $false $_.Exception.Message
