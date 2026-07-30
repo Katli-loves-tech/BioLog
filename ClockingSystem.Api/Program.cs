@@ -43,8 +43,12 @@ builder.Services.AddCors(options =>
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? Environment.GetEnvironmentVariable("JWT_KEY")
     ?? "replace-with-a-long-random-string-min-32-chars";
-var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "ClockingSystem";
-var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "ClockingSystemUsers";
+var jwtIssuer = builder.Configuration["Jwt:Issuer"]
+    ?? Environment.GetEnvironmentVariable("JWT_ISSUER")
+    ?? "ClockingSystem";
+var jwtAudience = builder.Configuration["Jwt:Audience"]
+    ?? Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+    ?? "ClockingSystemUsers";
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

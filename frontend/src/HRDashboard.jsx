@@ -1,37 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './HRDashboard.css';
 import HRSettings from './HRSettings';
+import { getHrDashboardSummary, getEmployeeHistory } from './api';
 
-function HRDashboard({ onLogout }) {
+function HRDashboard({ onLogout, user }) {
   const [activePage, setActivePage] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
+  const [summary, setSummary] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Sample employee data
-  const [employees] = useState([
-    { id: 1, name: 'John Doe', employeeNumber: 'EMP001', clockIn: '08:00', clockOut: '17:00', status: 'present', duration: '9h 0m' },
-    { id: 2, name: 'Jane Smith', employeeNumber: 'EMP002', clockIn: '08:15', clockOut: '17:00', status: 'late', duration: '8h 45m' },
-    { id: 3, name: 'Bob Johnson', employeeNumber: 'EMP003', clockIn: '-', clockOut: '-', status: 'absent', duration: '-' },
-    { id: 4, name: 'Alice Brown', employeeNumber: 'EMP004', clockIn: '07:55', clockOut: '17:05', status: 'present', duration: '9h 10m' },
-    { id: 5, name: 'Charlie Wilson', employeeNumber: 'EMP005', clockIn: '08:30', clockOut: '16:30', status: 'late', duration: '8h 0m' },
-    { id: 6, name: 'Diana Lee', employeeNumber: 'EMP006', clockIn: '-', clockOut: '-', status: 'absent', duration: '-' },
-  ]);
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
-  const totalEmployees = employees.length;
-  const presentCount = employees.filter(e => e.status === 'present').length;
-  const lateCount = employees.filter(e => e.status === 'late').length;
-  const absentCount = employees.filter(e => e.status === 'absent').length;
+  const fetchDashboardData = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const data = await getHrDashboardSummary();
+      setSummary(data);
+    } catch (err) {
+      setError('Failed to load dashboard data. Please try again.');
+      console.error('Dashboard fetch error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const totalEmployees = summary?.totalEmployees || 0;
+  const presentCount = summary?.presentCount || 0;
+  const lateCount = summary?.lateCount || 0;
+  const absentCount = summary?.absentCount || 0;
+
+  const employees = summary?.employees || [];
 
   const filteredEmployees = employees.filter(emp =>
-    emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (emp.fullName || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
     emp.employeeNumber.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleViewReport = (employee) => {
-    alert(`Viewing report for ${employee.name} (${employee.employeeNumber})`);
+  const handleViewReport = async (employee) => {
+    try {
+      const history = await getEmployeeHistory(employee.employeeNumber);
+      const historyText = history.map(h =>
+        `${h.status} - Clock In: ${h.clockInTime ? new Date(h.clockInTime).toLocaleTimeString() : '-'}, Clock Out: ${h.clockOutTime ? new Date(h.clockOutTime).toLocaleTimeString() : '-'}, Duration: ${h.duration || '-'}`
+      ).join('\n');
+      alert(`Report for ${employee.fullName} (${employee.employeeNumber}):\n\n${historyText || 'No history available.'}`);
+    } catch (err) {
+      alert(`Failed to load report for ${employee.fullName}.`);
+    }
   };
 
   const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
     onLogout();
+  };
+
+  const formatTime = (timestamp) => {
+    if (!timestamp) return '-';
+    return new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
   if (activePage === 'settings') {
@@ -125,6 +154,14 @@ function HRDashboard({ onLogout }) {
               />
             </div>
           </div>
+          {loading ? (
+            <div className="loading-state">Loading dashboard data...</div>
+          ) : error ? (
+            <div className="error-state">
+              <p>{error}</p>
+              <button className="retry-btn" onClick={fetchDashboardData}>Retry</button>
+            </div>
+          ) : (
           <table>
             <thead>
               <tr>
@@ -137,29 +174,36 @@ function HRDashboard({ onLogout }) {
               </tr>
             </thead>
             <tbody>
-              {filteredEmployees.map(emp => (
-                <tr key={emp.id}>
+              {filteredEmployees.length === 0 ? (
+                <tr>
+                  <td colSpan="6" className="no-data">No employees found</td>
+                </tr>
+              ) : (
+              filteredEmployees.map((emp, index) => (
+                <tr key={emp.employeeNumber || index}>
                   <td>
                     <div className="employee-info">
-                      <span className="emp-name">{emp.name}</span>
+                      <span className="emp-name">{emp.fullName}</span>
                       <span className="emp-number">{emp.employeeNumber}</span>
                     </div>
                   </td>
-                  <td>{emp.clockIn}</td>
-                  <td>{emp.clockOut}</td>
+                  <td>{formatTime(emp.clockInTime)}</td>
+                  <td>{formatTime(emp.clockOutTime)}</td>
                   <td>
-                    <span className={`status-badge ${emp.status}`}>
-                      {emp.status.charAt(0).toUpperCase() + emp.status.slice(1)}
+                    <span className={`status-badge ${(emp.status || '').toLowerCase()}`}>
+                      {emp.status || 'Unknown'}
                     </span>
                   </td>
-                  <td>{emp.duration}</td>
+                  <td>{emp.duration || '-'}</td>
                   <td>
                     <button className="view-btn" onClick={() => handleViewReport(emp)}>View</button>
                   </td>
                 </tr>
-              ))}
+              ))
+              )}
             </tbody>
           </table>
+          )}
         </div>
       </div>
     </div>

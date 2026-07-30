@@ -4,12 +4,15 @@ import HRDashboard from "./HRDashboard";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState(null);
 
-  const handleLogin = () => {
+  const handleLogin = (userData) => {
+    setUser(userData);
     setIsLoggedIn(true);
   };
 
   const handleLogout = () => {
+    setUser(null);
     setIsLoggedIn(false);
   };
 
@@ -17,7 +20,7 @@ function App() {
     return <Login onLogin={handleLogin} />;
   }
 
-  return <HRDashboard onLogout={handleLogout} />;
+  return <HRDashboard onLogout={handleLogout} user={user} />;
 }
 
 export default App;

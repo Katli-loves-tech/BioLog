@@ -264,3 +264,42 @@ td {
 .view-btn:hover {
   background-color: #2980b9;
 }
+
+.loading-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: 3rem;
+  color: #dc2626;
+}
+
+.error-state p {
+  margin-bottom: 1rem;
+}
+
+.retry-btn {
+  padding: 0.5rem 1.5rem;
+  background-color: #7c3aed;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.retry-btn:hover {
+  background-color: #6d28d9;
+}
+
+.no-data {
+  text-align: center;
+  padding: 2rem;
+  color: #888;
+  font-style: italic;
+}
