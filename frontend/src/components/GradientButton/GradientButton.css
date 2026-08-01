@@ -1,0 +1,25 @@
+.gradient-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 28px;
+  border-radius: 14px;
+  border: 3px solid transparent;
+  background-image: var(--btn-gradient), var(--btn-border-gradient);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  color: var(--btn-text);
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.gradient-button:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.gradient-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

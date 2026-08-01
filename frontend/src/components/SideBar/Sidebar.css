@@ -1,0 +1,104 @@
+.app-sidebar {
+  height: 100%;
+  min-height: 100vh;
+  background: var(--sidebar-gradient);
+  display: flex;
+  flex-direction: column;
+  padding: 28px 16px;
+  box-sizing: border-box;
+}
+
+.app-sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 90%;
+  margin: 0 auto 32px;
+}
+
+.app-sidebar-logo {
+  width: 32px;
+  height: auto;
+  object-fit: contain;
+}
+
+.app-sidebar-brand-text {
+  color: var(--sidebar-text);
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.app-sidebar-nav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.app-sidebar-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background-image: var(--sidebar-btn-gradient);
+  color: var(--sidebar-text);
+  text-decoration: none;
+  font-weight: 500;
+  transition: transform 0.15s ease;
+}
+
+.app-sidebar-link-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+/* Active route: text/icon enlarge slightly and go bold+white, per spec
+   ("increase in size when clicked... remains until navigated to a
+   different page" - NavLink's isActive already tracks the route). */
+.app-sidebar-link.active {
+  font-weight: 700;
+  color: #ffffff;
+  transform: scale(1.05);
+}
+.app-sidebar-link.active .app-sidebar-link-icon {
+  transform: scale(1.1);
+}
+
+.app-sidebar-logout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: none;
+  background-color: var(--logout-bg);
+  color: var(--sidebar-text);
+  font-weight: 400;
+  cursor: pointer;
+  margin-top: 16px;
+  transition: transform 0.15s ease, background-color 0.1s ease;
+}
+
+.app-sidebar-logout:hover {
+  background-image: var(--btn-gradient);
+  background-color: transparent;
+  border: 2px solid transparent;
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  transform: scale(1.05);
+}
+
+/* Momentarily "go back to normal" on the actual click, per spec */
+.app-sidebar-logout:active {
+  background-image: none;
+  background-color: var(--logout-bg);
+  transform: scale(1);
+}

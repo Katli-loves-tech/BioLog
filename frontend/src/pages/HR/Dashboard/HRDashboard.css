@@ -1,0 +1,85 @@
+.hr-dashboard-page {
+  background-color: var(--page-bg);
+}
+
+.hr-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin: 28px 0;
+}
+
+.hr-summary-grid .summary-card {
+  background-color: var(--table-bg-real);
+}
+
+.hr-section-title {
+  text-align: left;
+  color: #000;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-present {
+  background-color: var(--status-present-bg);
+  color: var(--status-present-text);
+}
+
+.status-late {
+  background-color: var(--status-late-bg);
+  color: var(--status-late-text);
+}
+
+.status-absent {
+  background-color: var(--status-absent-bg);
+  color: var(--status-absent-text);
+}
+
+.hr-view-link {
+  background: none;
+  border: none;
+  color: var(--link-color);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+}
+.hr-view-link:hover {
+  color: var(--link-hover);
+}
+
+.hr-view-all-link {
+  display: block;
+  margin-top: 14px;
+  background: none;
+  border: none;
+  color: var(--link-color);
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+  text-align: left;
+}
+.hr-view-all-link:hover {
+  color: var(--link-hover);
+}
+
+.employee-view-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.employee-view-table th,
+.employee-view-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--table-row-divider);
+  font-size: 0.9rem;
+}

@@ -1,0 +1,21 @@
+.auth-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+  background-color: var(--page-bg);
+}
+
+.auth-layout-sidebar {
+  width: 30%;
+  min-width: 260px;
+  flex-shrink: 0;
+}
+
+.auth-layout-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  box-sizing: border-box;
+}

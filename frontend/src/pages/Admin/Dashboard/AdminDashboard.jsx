@@ -1,207 +1,232 @@
-import { useEffect, useState } from "react";
-import { getEmployees, updateEmployee, deleteEmployee } from "../../../services/api";
+import { useState, useEffect, useMemo } from "react";
+import "./AdminDashboard.css";
+import Pagination from "../../../components/Pagination/Pagination";
+import Modal from "../../../components/Modal/Modal";
+import IconInput from "../../../components/IconInput/IconInput";
+import GradientButton from "../../../components/GradientButton/GradientButton";
+import { ProfileIcon, EditIcon, BinIcon, UserIcon, MailIcon } from "../../../components/Icons";
+import { getEmployees, deleteEmployee, updateEmployee } from "../../../services/api";
 
-const EMPTY_EDIT_FORM = {
-  firstName: "",
-  lastName: "",
-  position: "",
-  department: "",
-  contactNumber: "",
-  email: "",
-  role: "Employee",
-};
+const PAGE_SIZE = 6;
 
 export default function AdminDashboard() {
-  const [employees, setEmployees] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const user = JSON.parse(localStorage.getItem("user") || "{}");
 
-  // Which employee (if any) is currently being edited, and the draft values
-  // for that edit. Kept separate from the table data so typing in the form
-  // doesn't touch the list until Save is pressed.
-  const [editingEmployeeNumber, setEditingEmployeeNumber] = useState(null);
-  const [editForm, setEditForm] = useState(EMPTY_EDIT_FORM);
+  const [employees, setEmployees] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [editingEmployee, setEditingEmployee] = useState(null);
 
   useEffect(() => {
-    loadEmployees();
+    fetchEmployees();
   }, []);
 
-  const loadEmployees = async () => {
-    setIsLoading(true);
+  const fetchEmployees = async () => {
+    setLoading(true);
     setError("");
     try {
       const data = await getEmployees();
       setEmployees(data);
     } catch (err) {
-      setError(err.message);
+      setError("Failed to load employees. Please try again.");
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const startEdit = (employee) => {
-    setEditingEmployeeNumber(employee.employeeNumber);
-    setEditForm({
-      firstName: employee.firstName ?? "",
-      lastName: employee.lastName ?? "",
-      position: employee.position ?? "",
-      department: employee.department ?? "",
-      contactNumber: employee.contactNumber ?? "",
-      email: employee.email ?? "",
-      role: employee.role ?? "Employee",
-    });
-  };
+  // Excludes the logged-in admin from the managed list, per spec.
+  const visibleEmployees = useMemo(
+    () => employees.filter((e) => e.employeeNumber !== user.employeeNumber),
+    [employees, user.employeeNumber]
+  );
 
-  const cancelEdit = () => {
-    setEditingEmployeeNumber(null);
-    setEditForm(EMPTY_EDIT_FORM);
-  };
+  const pageStart = (page - 1) * PAGE_SIZE;
+  const pageEmployees = visibleEmployees.slice(pageStart, pageStart + PAGE_SIZE);
 
-  const handleEditChange = (field, value) => {
-    setEditForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const saveEdit = async (e) => {
-    e.preventDefault();
+  const handleDelete = async (empNo) => {
+    if (!window.confirm("Are you sure you want to delete this employee?")) return;
     try {
-      // Note: IdNumber, FaceVector, Password, and Gender are deliberately
-      // excluded — admins cannot update these per the spec.
-      await updateEmployee(editingEmployeeNumber, editForm);
-      await loadEmployees();
-      cancelEdit();
+      await deleteEmployee(empNo);
+      setEmployees((prev) => prev.filter((e) => e.employeeNumber !== empNo));
     } catch (err) {
-      setError(err.message);
+      alert("Failed to delete employee.");
     }
   };
 
-  const handleDelete = async (employeeNumber) => {
-    const confirmed = window.confirm("Delete this employee? This cannot be undone.");
-    if (!confirmed) return;
-
+  const handleSaveEdit = async (updates) => {
     try {
-      await deleteEmployee(employeeNumber);
-      await loadEmployees();
+      await updateEmployee(editingEmployee.employeeNumber, updates);
+      setEmployees((prev) =>
+        prev.map((e) =>
+          e.employeeNumber === editingEmployee.employeeNumber ? { ...e, ...updates } : e
+        )
+      );
+      setEditingEmployee(null);
     } catch (err) {
-      setError(err.message);
+      alert(err.data || "Failed to update employee.");
     }
   };
 
   return (
-    <div>
-      <h1>Admin Dashboard</h1>
+    <div className="admin-dashboard-page">
+      <header className="dashboard-header">
+        <h1>Employee Management</h1>
+        <div className="dashboard-header-profile">
+          <ProfileIcon className="dashboard-header-profile-icon" />
+          <div className="dashboard-header-profile-text">
+            <span className="dashboard-header-role">System Admin</span>
+            <span className="dashboard-header-name">{user.fullName || "Admin"}</span>
+          </div>
+        </div>
+      </header>
 
-      {error && <p role="alert">{error}</p>}
+      <section className="dashboard-summary-row">
+        <span className="dashboard-summary-label">Total Employees</span>
+        <span className="dashboard-summary-pill">{visibleEmployees.length}</span>
+      </section>
 
-      {isLoading ? (
-        <p>Loading employees...</p>
+      {loading ? (
+        <p className="dashboard-state-text">Loading employees...</p>
+      ) : error ? (
+        <div className="dashboard-state-text">
+          <p>{error}</p>
+          <button onClick={fetchEmployees}>Retry</button>
+        </div>
       ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Employee ID</th>
-              <th>Name</th>
-              <th>Surname</th>
-              <th>Phone Number</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((employee) => (
-              <tr key={employee.employeeNumber}>
-                <td>{employee.employeeNumber}</td>
-                <td>{employee.firstName}</td>
-                <td>{employee.lastName}</td>
-                <td>{employee.contactNumber}</td>
-                <td>{employee.email}</td>
-                <td>{employee.role}</td>
-                <td>
-                  <button type="button" onClick={() => startEdit(employee)}>
-                    Update
-                  </button>
-                  <button type="button" onClick={() => handleDelete(employee.employeeNumber)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <>
+          <div className="dashboard-table-wrapper">
+            <table className="dashboard-table">
+              <thead>
+                <tr>
+                  <th>Employee Number</th>
+                  <th>Name</th>
+                  <th>Surname</th>
+                  <th>Phone Number</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {pageEmployees.length === 0 ? (
+                  <tr>
+                    <td colSpan="7" className="dashboard-table-empty">
+                      No employees found
+                    </td>
+                  </tr>
+                ) : (
+                  pageEmployees.map((emp) => (
+                    <tr key={emp.employeeNumber}>
+                      <td>{emp.employeeNumber}</td>
+                      <td>{emp.firstName}</td>
+                      <td>{emp.lastName}</td>
+                      <td>{emp.contactNumber || "-"}</td>
+                      <td>{emp.email || "-"}</td>
+                      <td>{emp.portalRole || "Employee"}</td>
+                      <td className="dashboard-table-actions">
+                        <button
+                          type="button"
+                          className="dashboard-icon-btn"
+                          onClick={() => setEditingEmployee(emp)}
+                          title="Edit"
+                        >
+                          <EditIcon />
+                        </button>
+                        <button
+                          type="button"
+                          className="dashboard-icon-btn"
+                          onClick={() => handleDelete(emp.employeeNumber)}
+                          title="Delete"
+                        >
+                          <BinIcon />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <Pagination
+            currentPage={page}
+            totalItems={visibleEmployees.length}
+            pageSize={PAGE_SIZE}
+            onPageChange={setPage}
+          />
+        </>
       )}
 
-      {editingEmployeeNumber && (
-        <form onSubmit={saveEdit}>
-          <h2>Update Employee {editingEmployeeNumber}</h2>
-
-          <label>
-            First Name
-            <input
-              value={editForm.firstName}
-              onChange={(e) => handleEditChange("firstName", e.target.value)}
-              required
-            />
-          </label>
-
-          <label>
-            Last Name
-            <input
-              value={editForm.lastName}
-              onChange={(e) => handleEditChange("lastName", e.target.value)}
-              required
-            />
-          </label>
-
-          <label>
-            Position
-            <input
-              value={editForm.position}
-              onChange={(e) => handleEditChange("position", e.target.value)}
-            />
-          </label>
-
-          <label>
-            Department
-            <input
-              value={editForm.department}
-              onChange={(e) => handleEditChange("department", e.target.value)}
-            />
-          </label>
-
-          <label>
-            Contact Number
-            <input
-              value={editForm.contactNumber}
-              onChange={(e) => handleEditChange("contactNumber", e.target.value)}
-            />
-          </label>
-
-          <label>
-            Email
-            <input
-              type="email"
-              value={editForm.email}
-              onChange={(e) => handleEditChange("email", e.target.value)}
-            />
-          </label>
-
-          <label>
-            Role
-            <select
-              value={editForm.role}
-              onChange={(e) => handleEditChange("role", e.target.value)}
-            >
-              <option value="Employee">Employee</option>
-              <option value="HR">HR</option>
-            </select>
-          </label>
-
-          <button type="submit">Save</button>
-          <button type="button" onClick={cancelEdit}>
-            Cancel
-          </button>
-        </form>
-      )}
+      <EditEmployeeModal
+        employee={editingEmployee}
+        onClose={() => setEditingEmployee(null)}
+        onSave={handleSaveEdit}
+      />
     </div>
+  );
+}
+
+function EditEmployeeModal({ employee, onClose, onSave }) {
+  const [form, setForm] = useState(null);
+
+  useEffect(() => {
+    if (employee) {
+      setForm({
+        firstName: employee.firstName || "",
+        lastName: employee.lastName || "",
+        contactNumber: employee.contactNumber || "",
+        email: employee.email || "",
+        position: employee.position || "",
+        department: employee.department || "",
+      });
+    } else {
+      setForm(null);
+    }
+  }, [employee]);
+
+  if (!employee || !form) return null;
+
+  const handleChange = (field) => (e) => setForm({ ...form, [field]: e.target.value });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onSave(form);
+  };
+
+  return (
+    <Modal open={Boolean(employee)} onClose={onClose} title={`Edit ${employee.employeeNumber}`}>
+      <form className="admin-edit-form" onSubmit={handleSubmit}>
+        <IconInput
+          id="editFirstName"
+          label="First Name"
+          icon={UserIcon}
+          value={form.firstName}
+          onChange={handleChange("firstName")}
+        />
+        <IconInput
+          id="editLastName"
+          label="Last Name"
+          icon={UserIcon}
+          value={form.lastName}
+          onChange={handleChange("lastName")}
+        />
+        <IconInput
+          id="editEmail"
+          label="Email"
+          icon={MailIcon}
+          type="email"
+          value={form.email}
+          onChange={handleChange("email")}
+        />
+        <IconInput
+          id="editContact"
+          label="Contact Number"
+          value={form.contactNumber}
+          onChange={handleChange("contactNumber")}
+        />
+        <GradientButton type="submit">Save Changes</GradientButton>
+      </form>
+    </Modal>
   );
 }

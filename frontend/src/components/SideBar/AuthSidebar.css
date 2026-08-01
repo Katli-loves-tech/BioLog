@@ -1,0 +1,80 @@
+.auth-sidebar {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  background: var(--sidebar-gradient);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+  padding-top: 48px; /* "a bit of space" above the logo */
+  color: var(--sidebar-text);
+}
+
+.auth-sidebar-brand {
+  width: 50%; /* logo + text combo takes half the sidebar's horizontal space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.auth-sidebar-logo {
+  width: 42px;
+  height: auto;
+  aspect-ratio: 671 / 591;
+  object-fit: contain;
+}
+
+.auth-sidebar-brand-text {
+  color: var(--sidebar-text);
+  font-weight: 700;
+  font-size: 1.4rem;
+  white-space: nowrap;
+}
+
+.auth-sidebar-tagline {
+  width: 78%;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.auth-sidebar-tagline-primary {
+  color: var(--sidebar-text);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+.auth-sidebar-tagline-secondary {
+  color: var(--smarter-attendance-color);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin: 2px 0 0;
+}
+
+.auth-sidebar-tagline-body {
+  color: var(--sidebar-text);
+  font-weight: 400;
+  font-size: 0.8rem;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+.auth-sidebar-illustration {
+  margin-top: auto;
+  height: 40%;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  box-sizing: border-box;
+  padding-bottom: 24px;
+}
+
+.auth-sidebar-illustration-img {
+  width: 90%;
+  height: auto;
+  aspect-ratio: 1207 / 905;
+  object-fit: contain;
+}

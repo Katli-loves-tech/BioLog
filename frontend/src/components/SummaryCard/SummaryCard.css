@@ -1,0 +1,39 @@
+.summary-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background-color: var(--pill-bg);
+  border: 1px solid var(--pill-border);
+  border-radius: 30px;
+  padding: 16px 22px;
+}
+
+.summary-card-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.summary-card-label {
+  color: var(--pill-text);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.summary-card-value {
+  color: var(--pill-text);
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.summary-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.summary-card-icon img,
+.summary-card-icon svg {
+  width: 32px;
+  height: 32px;
+}

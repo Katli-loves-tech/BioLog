@@ -1,0 +1,69 @@
+.icon-input-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Label sits right above the field, left edge aligned with the field's
+   left edge (Part 1.2.e) */
+.icon-input-label {
+  color: var(--label-text);
+  font-weight: 600;
+  font-size: 0.875rem;
+  margin-bottom: 6px;
+}
+
+.icon-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: var(--input-bg);
+  border: 1px solid var(--input-border);
+  border-radius: var(--input-radius);
+  padding: 0 14px;
+}
+
+/* Icon far left, with breathing room from the border (Part 1.2.g) */
+.icon-input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+.icon-input-icon img,
+.icon-input-icon svg {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+}
+
+.icon-input-field {
+  flex: 1;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 12px 4px;
+  font-size: 0.95rem;
+  color: var(--input-text);
+  text-align: left;
+}
+
+.icon-input-field::placeholder {
+  color: var(--input-placeholder);
+}
+
+.icon-input-eye-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--input-placeholder);
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  flex-shrink: 0;
+}
+.icon-input-eye-toggle:hover {
+  color: #7a8383;
+}

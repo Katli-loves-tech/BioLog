@@ -1,0 +1,126 @@
+.admin-dashboard-page {
+  background-color: var(--page-bg);
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dashboard-header h1 {
+  font-size: 1.5rem;
+  color: #000;
+  margin: 0;
+}
+
+.dashboard-header-profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-header-profile-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.dashboard-header-profile-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.dashboard-header-role {
+  font-size: 0.75rem;
+  color: #8d8d8d;
+}
+
+.dashboard-header-name {
+  font-weight: 700;
+  color: #000;
+}
+
+.dashboard-summary-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+.dashboard-summary-label {
+  font-weight: 700;
+  color: #000;
+}
+
+.dashboard-summary-pill {
+  color: var(--pill-text);
+  background-color: var(--pill-bg);
+  border: 1px solid var(--pill-border);
+  border-radius: 30px;
+  padding: 6px 22px;
+  font-weight: 700;
+}
+
+.dashboard-state-text {
+  color: #8d8d8d;
+  padding: 24px 0;
+}
+
+.dashboard-table-wrapper {
+  overflow-x: auto;
+  border-radius: 14px;
+}
+
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: var(--table-bg-real);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.dashboard-table thead th {
+  text-align: left;
+  padding: 14px 18px;
+  color: var(--table-header-text);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.dashboard-table tbody td {
+  padding: 14px 18px;
+  color: var(--table-row-text);
+  font-size: 0.9rem;
+  border-top: 1px solid var(--table-row-divider);
+}
+
+.dashboard-table-empty {
+  text-align: center;
+  color: #8d8d8d;
+}
+
+.dashboard-table-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.dashboard-icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+.dashboard-icon-btn img {
+  width: 18px;
+  height: 18px;
+}
+
+.admin-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
